@@ -2,7 +2,7 @@
  * ofxOpenNI.h
  *
  * Copyright 2011 (c) Matthew Gingold http://gingold.com.au
- * Originally forked from a project by roxlu http://www.roxlu.com/ 
+ * Originally forked from a project by roxlu http://www.roxlu.com/
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -41,8 +41,6 @@
 #include "ofxTrackedHand.h"
 #include "ofxOpenNIRecorder.h"
 
-#if defined (TARGET_OSX) //|| defined(TARGET_LINUX) // only working on Mac/Linux at the moment (but on Linux you need to run as sudo...)
 #include "ofxHardwareDriver.h"
-#endif
 
 #endif

@@ -2,7 +2,7 @@
  * ofxHardwareDriver.cpp
  *
  * Copyright 2011 (c) Matthew Gingold http://gingold.com.au
- * Originally forked from a project by roxlu http://www.roxlu.com/ 
+ * Originally forked from a project by roxlu http://www.roxlu.com/
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -30,8 +30,6 @@
 
 #include "ofxHardwareDriver.h"
 
-#if defined (TARGET_OSX)
-
 ofxHardwareDriver::ofxHardwareDriver() {
 	printf("Init lib_usb control of Kinect Motor, LEDs and accelerometers");
 }
@@ -51,7 +49,7 @@ void ofxHardwareDriver::setup(int index)
 		printf("No device on USB\n");
 		return;
 	}
-	
+
 	int nr_mot(0);
 	for (int i = 0; i < cnt; ++i)
 	{
@@ -59,9 +57,9 @@ void ofxHardwareDriver::setup(int index)
 		const int r = libusb_get_device_descriptor (devs[i], &desc);
 		if (r < 0)
 			continue;
-		
+
 		printf("Device: %i Vendor: %i Product: %i\n", i, desc.idVendor, desc.idProduct);
-		
+
 		// Search for the aux
 		if (desc.idVendor == MS_MAGIC_VENDOR && desc.idProduct == MS_MAGIC_MOTOR_PRODUCT)
 		{
@@ -82,21 +80,21 @@ void ofxHardwareDriver::setup(int index)
 				nr_mot++;
 		}
 	}
-	
+
 	libusb_free_device_list (devs, 1);  // free the list, unref the devices in it
-	
+
 	// capture current tilt angle (all good if we don't move the kinect)
 	update();
 	tilt_angle = ofClamp(getTiltAngle(), -30, 30); // to be sure, to be sure ;-)
-	//setTiltAngle(0);	// leaving this reset out for now as that way installations 
-	// do not need to be reset ever startup however can cause 
-	// strange behaviour if the kinect is tilted in between 
-	// application starts eg., the angle continues to be set 
+	//setTiltAngle(0);	// leaving this reset out for now as that way installations
+	// do not need to be reset ever startup however can cause
+	// strange behaviour if the kinect is tilted in between
+	// application starts eg., the angle continues to be set
 	// even when app not running...which is odd...
-	
+
 }
 
-void ofxHardwareDriver::update() 
+void ofxHardwareDriver::update()
 {
 	//freenect_context *ctx = dev->parent;
 	uint8_t buf[10];
@@ -107,11 +105,11 @@ void ofxHardwareDriver::update()
 		printf("Error in accelerometer reading, libusb_control_transfer returned %d\n", ret);
 		return;// ret < 0 ? ret : -1;
 	}
-	
+
 	ux = ((uint16_t)buf[2] << 8) | buf[3];
 	uy = ((uint16_t)buf[4] << 8) | buf[5];
 	uz = ((uint16_t)buf[6] << 8) | buf[7];
-	
+
 	//the documentation for the accelerometer (http://www.kionix.com/Product%20Sheets/KXSD9%20Product%20Brief.pdf)
 	//states there are 819 counts/g
 	tilt_state.accelerometer_x = (int16_t)ux/FREENECT_COUNTS_PER_G*GRAVITY;
@@ -119,17 +117,17 @@ void ofxHardwareDriver::update()
 	tilt_state.accelerometer_z = (int16_t)uz/FREENECT_COUNTS_PER_G*GRAVITY;
 	tilt_state.tilt_angle = (int)buf[8];
 	tilt_state.tilt_status = (tilt_status_code)buf[9];
-	
+
 	//return ret;
 }
 
 void ofxHardwareDriver::setTiltAngle(int angle)
 {
-	
+
 	ofClamp(angle, -30, 30); // just to make super sure...
-	
+
 	uint8_t empty[0x1];
-	
+
 	angle = (angle<MIN_TILT_ANGLE) ? MIN_TILT_ANGLE : ((angle>MAX_TILT_ANGLE) ? MAX_TILT_ANGLE : angle);
 	angle = angle * 2;
 	const int ret = libusb_control_transfer(dev, 0x40, 0x31, (uint16_t)angle, 0x0, empty, 0x0, 0);
@@ -138,7 +136,7 @@ void ofxHardwareDriver::setTiltAngle(int angle)
 		printf("Error in setting tilt angle, libusb_control_transfer returned %i", ret);
 		return;
 	}
-	
+
 	//tilt_angle = angle;
 }
 
@@ -162,12 +160,10 @@ void ofxHardwareDriver::setLedOption(uint16_t option)
 }
 
 void ofxHardwareDriver::shutDown() {
-	//setTiltAngle(0);	// leaving this reset out for now as that way installations 
-						// do not need to be reset ever startup however can cause 
-						// strange behaviour if the kinect is tilted in between 
-						// application starts eg., the angle continues to be set 
+	//setTiltAngle(0);	// leaving this reset out for now as that way installations
+						// do not need to be reset ever startup however can cause
+						// strange behaviour if the kinect is tilted in between
+						// application starts eg., the angle continues to be set
 						// even when app not running...which is odd...
 	libusb_exit(ctx);
 }
-
-#endif

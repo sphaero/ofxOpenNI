@@ -2,7 +2,7 @@
  * ofxHardwareDriver.h
  *
  * Copyright 2011 (c) Matthew Gingold http://gingold.com.au
- * Originally forked from a project by roxlu http://www.roxlu.com/ 
+ * Originally forked from a project by roxlu http://www.roxlu.com/
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -33,8 +33,7 @@
 
 #include "ofMain.h"
 
-#if defined (TARGET_OSX)
-// based on ROS kinect_aux.cpp driver and freenect tilt.c for controlling motor and accelerometers 
+// based on ROS kinect_aux.cpp driver and freenect tilt.c for controlling motor and accelerometers
 
 #include <libusb.h>
 
@@ -83,33 +82,33 @@ typedef struct {
 
 class ofxHardwareDriver {
 public:
-	
+
 	ofxHardwareDriver();
 	~ofxHardwareDriver();
-	
+
 	void	setup(int index = 0);
 	void	update();
-	
+
 	void	setTiltAngle(int angle);
 	int		getTiltAngle();
-	
+
 	void	setLedOption(uint16_t option);
-	
+
 	ofPoint	getAccelerometers();
-	
+
 	int		tilt_angle;
-	
+
 	void shutDown();
-    
+
     libusb_context *ctx;
-	
+
 private:
-	
+
 	libusb_device_handle *dev;
-	
+
 	raw_tilt_state tilt_state;
-	
+
 };
 
 #endif
-#endif
+
